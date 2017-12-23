@@ -6,7 +6,6 @@ Flask
 gnupg
 Jinja2
 jsmin
-prompt_toolkit
 psutil
 pycrypto
 pyotp
