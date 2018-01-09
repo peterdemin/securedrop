@@ -107,6 +107,23 @@
       default: ""
       private: no
 
+    - name: signal_notifications
+      prompt: Enable Signal notifications (beta)
+      default: "no"
+      private: no
+
+    - name: signal_number
+      prompt: Enable Signal notifications (beta)
+      default: "no"
+      private: no
+      when: signal_notifications
+
+    - name: signal_destination_number
+      prompt: Enable Signal notifications (beta)
+      default: "no"
+      private: no
+      when: signal_notifications
+
   pre_tasks:
     - debug:
         msg: >-
@@ -172,6 +189,14 @@
           var_value: "{{ securedrop_app_https_on_source_interface | bool}}"
         - var_name: securedrop_supported_locales
           var_value: "{% if securedrop_supported_locales is string %}{{ securedrop_supported_locales.split() | to_yaml }}{% else %}{{ securedrop_supported_locales | to_yaml }}{% endif %}"
+        - var_name: signal_notifications
+          var_value: "{{ signal_notifications | bool}}"
+        - var_name: signal_number
+          var_value: "{{ signal_number }}"
+          when: signal_notifications
+        - var_name: signal_destination_number
+          var_value: "{{ signal_destination_number }}"
+          when: signal_notifications
 
 - name: Validate site-specific information.
   hosts: localhost

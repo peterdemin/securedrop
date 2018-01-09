@@ -35,6 +35,8 @@
   hosts: mon-staging
   roles:
     - { role: ossec-server, tags: [ ossec, ossec_server ] }
+    - { role: ansible-role-signal-cli, tags: signal-cli,
+        when: signal_notifications is defined and signal_notifications }
   become: yes
 
 - name: Configure SecureDrop Application Server.

@@ -39,3 +39,19 @@
     that:
       - smtp_relay is defined
       - sasl_domain is defined
+
+- name: Validate Signal source number
+  assert:
+    that:
+      - signal_source_number | regex_search('^\+\d+$') | bool
+    msg: >-
+      Signal source number is incorrectly formatted. Format should be
+      "+15555555555" (where 1 is country codename and 5555555 is number)
+
+- name: Validate Signal destination number
+  assert:
+    that:
+      - signal_destination_number | regex_search('^\+\d+$') | bool
+    msg: >-
+      Signal destination number is incorrectly formatted. Format should be
+      "+15555555555" (where 1 is country codename and 5555555 is number)

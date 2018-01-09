@@ -1,0 +1,71 @@
+---
+- block:
+  - name: Install openJDK-jre-headless
+    apt:
+      name: openjdk-7-jre-headless
+      state: latest
+  - name: Install AppArmor utils
+    apt:
+      name: apparmor-utils
+      state: latest
+
+  - name: Convert jvm header for pax
+    shell: "paxctl -c /usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/java"
+    become: yes
+
+  - name: Set jvm pax flag
+    shell: "paxctl -m /usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/java"
+    become: yes
+
+  - name: Copy pubkey
+    copy: src=../files/asamk.pub dest=/tmp/asamk.pub
+
+  - name: Import pubkey
+    shell: "gpg --import /tmp/asamk.pub"
+
+  # TODO: Ideally we'd write a Python module which finds the latest version, so we
+  # don't have to maintain the signal_cli_version var ourselves.
+  - name: Download signal-cli v{{ signal_cli_version }}.
+    get_url:
+      url: "{{ item }}"
+      dest: /opt/{{ item | basename }}
+      checksum: "{{ signal_cli_checksum }}"
+    with_items:
+      - "{{ signal_cli_url }}"
+
+  - name: Download signal-cli v{{ signal_cli_version }} signature.
+    get_url:
+      url: "{{ item }}"
+      dest: /opt/{{ item | basename }}
+    with_items:
+      - "{{ signal_cli_sig_url }}"
+
+  - name: Verify signature
+    shell: "gpg --verify /opt/{{ signal_cli_sig_url | basename }}"
+
+  - name: Unarchive signal-cli v{{ signal_cli_version }}.
+    unarchive:
+      src: /opt/{{ signal_cli_url | basename }}
+      remote_src: True
+      dest: /opt/
+      creates: /opt/signal-cli-{{ signal_cli_version }}
+
+  - name: Create /usr/local/bin/signal-cli symlink.
+    file:
+      state: link
+      src: /opt/signal-cli-{{ signal_cli_version }}/bin/signal-cli
+      dest: /usr/local/bin/signal-cli
+
+  - name: Copy AppArmor profile
+    template:
+      src: ../files/usr.lib.jvm.java-7-openjdk-amd64.jre.bin.java.j2
+      dest: /etc/apparmor.d/usr.lib.jvm.java-7-openjdk-amd64.jre.bin.java
+      owner: root
+      mode: "0644"
+    notify:
+        - restart apparmor
+
+  - name: Set AppArmor to enforce
+    shell: "aa-enforce /etc/apparmor.d/usr.lib.jvm.java-7-openjdk-amd64.jre.bin.java"
+
+  become: True
