@@ -25,7 +25,7 @@ ci-lint-image: ## Builds linting container.
 
 .PHONY: ci-lint
 ci-lint: ## Runs linting in linting container.
-	docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock securedrop-lint:${TAG}
+	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock securedrop-lint:${TAG}
 
 .PHONY: docs-lint
 docs-lint: ## Check documentation for common syntax errors.

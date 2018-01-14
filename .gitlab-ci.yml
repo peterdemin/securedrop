@@ -1,5 +1,32 @@
-jobs:
+stages:
+  - environment
+  - tests
+  - integration
+
+base-image:
+  stage: environment
   script: |
+    cd devops/docker
+    docker build -f stretch-development.docker -t stretch-development .
+    docker build -f trusty-ansible-target.docker -t trusty-ansible-target .
+
+lint:
+  stage: tests
+  image: stretch-development
+  script: |
+    make ci-lint-image ci-lint
+
+tests:
+  stage: tests
+  image: stretch-development
+  script: |
+    make -C securedrop testclean || true
+    make -C securedrop images test
+
+integration-test:
+  stage: integration
+  script: |
+    exit 0
     cd devops/openstack
     source bootstrap
     perl -p -e 's/\$(\w+)/$ENV{$1}/e' < clouds.yml.example > clouds.yml
