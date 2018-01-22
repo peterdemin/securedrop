@@ -1,0 +1,20 @@
+---
+- name: /usr/sbin/policy-rc.d exit 0
+  command: |
+    echo '#!/bin/bash' > /usr/sbin/policy-rc.d
+
+- name: do not block on /dev/random
+  shell: |
+    rm /dev/random
+    ln -s /dev/urandom /dev/random
+
+- name: restart servers
+  service:
+    name: "{{ item }}"
+    state: restarted
+  ignore_errors: yes
+  with_items:
+    - apache2
+    - redis-server
+    - ossec
+    - supervisor

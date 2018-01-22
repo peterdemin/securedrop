@@ -8,9 +8,9 @@ ssh_users: "vagrant"
 # Vagrant reserves eth0 for host gateway at 10.0.2.15; use eth1 for internal IPs.
 # In production, the IPs are hardcoded, and must also be set in the firewall config.
 primary_network_iface: eth1
-monitor_ip: "{{ hostvars['mon-staging']['ansible_'+primary_network_iface].ipv4.address }}"
+monitor_ip: "{{ hostvars['mon-staging']['ansible_default_ipv4'].address }}"
 monitor_hostname: "{{ hostvars['mon-staging'].ansible_hostname }}"
-app_ip: "{{ hostvars['app-staging']['ansible_'+primary_network_iface].ipv4.address }}"
+app_ip: "{{ hostvars['app-staging']['ansible_default_ipv4'].address }}"
 app_hostname: "{{ hostvars['app-staging'].ansible_hostname }}"
 
 ### Used by the app role ###

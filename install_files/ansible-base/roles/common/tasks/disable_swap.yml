@@ -16,3 +16,4 @@
   changed_when: swap_status.stdout.find('/') == 0
   tags:
     - swapspace
+  when: ansible_virtualization_type != 'docker'

@@ -3,6 +3,8 @@
 # and aid in clearing memory. Only the hour is configurable.
 daily_reboot_time: 4 # An integer between 0 and 23
 
+apt_repo_url: https://apt.freedom.press
+
 disabled_kernel_modules:
   - btusb
   - bluetooth

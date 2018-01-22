@@ -4,6 +4,7 @@
 - include: create_users.yml
 
 - include: setup_etc_hosts.yml
+  when: ansible_virtualization_type != 'docker'
 
 - include: harden_dns.yml
 
@@ -18,7 +19,10 @@
 - include: apt_upgrade.yml
 
 - include: sysctl.yml
+  when: ansible_virtualization_type != 'docker'
 
 - include: disable_swap.yml
+  when: ansible_virtualization_type != 'docker'
 
 - include: remove_kernel_modules.yml
+  when: ansible_virtualization_type != 'docker'

@@ -18,13 +18,23 @@
       when: "'../../build/'+item not in found_debs"
       with_items: "{{ expected_debs }}"
 
+  gather_facts: false
+
+- name:
+  hosts: staging
+  strategy: debug
+  roles:
+  - common
+
 - name: Add FPF apt repository and install base packages.
   hosts: staging
   roles:
     - role: ci-tweaks
       when: amazon_builder
+    - role: docker-tweaks
+      when: ansible_virtualization_type == 'docker'
     - { role: install-fpf-repo, tags: [fpfrepo] }
-    - { role: grsecurity, when: grsecurity, tags: [grsec, grsecurity] }
+    - { role: grsecurity, when: grsecurity and ansible_virtualization_type != 'docker', tags: [grsec, grsecurity] }
     - { role: common, tags: common }
     - { role: tor-hidden-services, tags: tor }
     - { role: install-local-packages, tags: [install_local_packages, rebuild],
@@ -51,12 +61,12 @@
 - name: Configure host firewalls (with direct access for staging).
   hosts: staging
   roles:
-    - { role: restrict-direct-access, tags: [ common, restrict-direct-access ] }
+    - { role: restrict-direct-access, when: ansible_virtualization_type != 'docker', tags: [ common, restrict-direct-access ] }
   become: yes
 
 - name: Reboot Application and Monitor Servers.
   hosts: staging
   tasks:
     - include: tasks/reboot_if_first_install.yml
-      when: not amazon_builder
+      when: not amazon_builder and ansible_virtualization_type != 'docker'
   become: yes
